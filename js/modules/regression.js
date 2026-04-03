@@ -5,32 +5,46 @@ window.ModuleRegression = {
   model: null,
 
   render(container) {
+    const hasData = AppState.hasData();
     container.innerHTML = `
       <div class="module-header">
         <h2>Simple Linear Regression</h2>
         <p>Fit a line to your data and make predictions using the regression equation.</p>
       </div>
+      ${!hasData ? Utils.noDataWarning('regression', 'height-weight', 'Height vs Weight') : ''}
       <div class="module-grid">
         <div class="card">
           <div class="card-header"><h3>Variable Selection</h3></div>
           <div class="card-body">
-            <div class="var-selector">
-              <div class="form-group">
-                <label>X (Independent)</label>
-                <select id="regVarX">${DataManager.getVariableOptions()}</select>
+            ${hasData ? `
+              <div class="var-selector">
+                <div class="form-group">
+                  <label>X (Independent)</label>
+                  <select id="regVarX">${DataManager.getVariableOptions()}</select>
+                </div>
+                <div class="form-group">
+                  <label>Y (Dependent)</label>
+                  <select id="regVarY">
+                    ${AppState.data.headers.map((h, i) =>
+                      `<option value="${i}" ${i === 1 ? 'selected' : ''}>${Utils.escHtml(h)}</option>`
+                    ).join('')}
+                  </select>
+                </div>
+                <button class="btn btn-primary" id="regCompute">Calculate</button>
               </div>
-              <div class="form-group">
-                <label>Y (Dependent)</label>
-                <select id="regVarY">
-                  ${AppState.data.headers.map((h, i) =>
-                    `<option value="${i}" ${i === 1 ? 'selected' : ''}>${Utils.escHtml(h)}</option>`
-                  ).join('')}
-                </select>
-              </div>
-              <button class="btn btn-primary" id="regCompute">Calculate</button>
-            </div>
+            ` : `<p class="text-muted" style="font-size:0.85rem">Load a dataset with at least 2 numeric columns.</p>`}
           </div>
         </div>
+
+        ${!hasData ? Utils.onboardingGuide({
+          steps: [
+            { title: 'Load paired data', desc: 'You need <strong>two numeric variables</strong> (e.g., Height as X, Weight as Y). Load from Data Input or click below.' },
+            { title: 'Select X and Y', desc: 'X is the <strong>independent</strong> (predictor) variable. Y is the <strong>dependent</strong> (outcome) variable.' },
+            { title: 'View results', desc: 'Get the regression equation (<code>y = mx + b</code>), R\u00B2, scatterplot with fitted line, and a prediction tool.' }
+          ],
+          exampleKey: 'height-weight',
+          exampleLabel: 'Height vs Weight (25 pairs)'
+        }) : ''}
 
         <div class="card" id="regChartCard" style="display:none">
           <div class="card-header"><h3>Regression Line</h3></div>
@@ -64,10 +78,21 @@ window.ModuleRegression = {
       </div>
     `;
 
-    $('#regCompute').addEventListener('click', () => this.compute());
-    $('#regPredictBtn').addEventListener('click', () => this.predict());
-    $('#regPredictX').addEventListener('keydown', (e) => {
+    const regBtn = $('#regCompute');
+    if (regBtn) regBtn.addEventListener('click', () => this.compute());
+    const predBtn = $('#regPredictBtn');
+    if (predBtn) predBtn.addEventListener('click', () => this.predict());
+    const predInput = $('#regPredictX');
+    if (predInput) predInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') this.predict();
+    });
+
+    Utils.bindGuideButtons(container, () => {
+      UI.switchModule('regression');
+      setTimeout(() => {
+        const btn = $('#regCompute');
+        if (btn) btn.click();
+      }, 100);
     });
   },
 

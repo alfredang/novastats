@@ -6,11 +6,22 @@ window.ModuleChiSquare = {
   contingencyCols: 2,
 
   render(container) {
+    const hasData = AppState.hasData();
     container.innerHTML = `
       <div class="module-header">
         <h2>Chi-Square Tests</h2>
         <p>Test for independence between categorical variables or goodness-of-fit against expected distributions.</p>
       </div>
+
+      ${!hasData ? Utils.onboardingGuide({
+        steps: [
+          { title: 'Choose a test type', desc: '<strong>Independence</strong>: tests if two categorical variables are related (uses a contingency table). <strong>Goodness-of-Fit</strong>: tests if observed frequencies match expected frequencies.' },
+          { title: 'Enter your data', desc: 'For Independence, fill in the contingency table directly (or click <strong>Load Example</strong>). For Goodness-of-Fit, enter observed and expected values as comma-separated numbers, or load a dataset.' },
+          { title: 'Run the test', desc: 'View \u03C7\u00B2 statistic, p-value, expected frequencies table, observed vs expected bar chart, and the reject/fail to reject decision.' }
+        ],
+        exampleKey: 'survey-responses',
+        exampleLabel: 'Survey Data (5 categories)'
+      }) : ''}
 
       <div class="card" style="margin-bottom:20px">
         <div class="sub-tabs" id="chiTabs">
@@ -123,6 +134,20 @@ window.ModuleChiSquare = {
     $('#chiGofCompute').addEventListener('click', () => this.runGoodnessOfFit());
 
     this.buildContingencyGrid();
+
+    Utils.bindGuideButtons(container, () => {
+      UI.switchModule('chi-square');
+      setTimeout(() => {
+        document.querySelector('[data-tab="chi-gof"]').click();
+        setTimeout(() => {
+          const obs = $('#chiGofObs');
+          if (obs) { obs.value = '0'; obs.dispatchEvent(new Event('change')); }
+          const exp = $('#chiGofExp');
+          if (exp) { exp.value = '1'; exp.dispatchEvent(new Event('change')); }
+          setTimeout(() => { const btn = $('#chiGofCompute'); if (btn) btn.click(); }, 100);
+        }, 100);
+      }, 100);
+    });
   },
 
   buildContingencyGrid() {

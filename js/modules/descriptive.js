@@ -3,24 +3,38 @@
 window.ModuleDescriptive = {
 
   render(container) {
+    const hasData = AppState.hasData();
     container.innerHTML = `
       <div class="module-header">
         <h2>Descriptive Statistics</h2>
         <p>Calculate central tendency, dispersion, and distribution measures for your data.</p>
       </div>
+      ${!hasData ? Utils.noDataWarning('descriptive', 'exam-scores', 'Exam Scores') : ''}
       <div class="module-grid">
         <div class="card">
           <div class="card-header"><h3>Variable Selection</h3></div>
           <div class="card-body">
-            <div class="var-selector">
-              <div class="form-group">
-                <label>Select Variable</label>
-                <select id="descVar">${DataManager.getVariableOptions()}</select>
+            ${hasData ? `
+              <div class="var-selector">
+                <div class="form-group">
+                  <label>Select Variable</label>
+                  <select id="descVar">${DataManager.getVariableOptions()}</select>
+                </div>
+                <button class="btn btn-primary" id="descCompute">Calculate</button>
               </div>
-              <button class="btn btn-primary" id="descCompute">Calculate</button>
-            </div>
+            ` : `<p class="text-muted" style="font-size:0.85rem">Load a dataset to select variables.</p>`}
           </div>
         </div>
+
+        ${!hasData ? Utils.onboardingGuide({
+          steps: [
+            { title: 'Load or enter data', desc: 'Go to <strong>Data Input</strong> and paste CSV data, or click an example dataset below.' },
+            { title: 'Select a variable', desc: 'Choose which column (variable) to analyze from the dropdown.' },
+            { title: 'Click Calculate', desc: 'View mean, median, mode, variance, standard deviation, quartiles, histogram, and a plain English interpretation.' }
+          ],
+          exampleKey: 'exam-scores',
+          exampleLabel: 'Exam Scores (30 values)'
+        }) : ''}
 
         <div class="card" id="descChartCard" style="display:none">
           <div class="card-header"><h3>Distribution</h3></div>
@@ -48,7 +62,16 @@ window.ModuleDescriptive = {
       </div>
     `;
 
-    $('#descCompute').addEventListener('click', () => this.compute());
+    const descBtn = $('#descCompute');
+    if (descBtn) descBtn.addEventListener('click', () => this.compute());
+
+    Utils.bindGuideButtons(container, () => {
+      UI.switchModule('descriptive');
+      setTimeout(() => {
+        const btn = $('#descCompute');
+        if (btn) btn.click();
+      }, 100);
+    });
   },
 
   compute() {

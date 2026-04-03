@@ -3,32 +3,46 @@
 window.ModuleCorrelation = {
 
   render(container) {
+    const hasData = AppState.hasData();
     container.innerHTML = `
       <div class="module-header">
         <h2>Correlation Analysis</h2>
         <p>Measure the strength and direction of the linear relationship between two variables.</p>
       </div>
+      ${!hasData ? Utils.noDataWarning('correlation', 'height-weight', 'Height vs Weight') : ''}
       <div class="module-grid">
         <div class="card">
           <div class="card-header"><h3>Variable Selection</h3></div>
           <div class="card-body">
-            <div class="var-selector">
-              <div class="form-group">
-                <label>X Variable</label>
-                <select id="corrVarX">${DataManager.getVariableOptions()}</select>
+            ${hasData ? `
+              <div class="var-selector">
+                <div class="form-group">
+                  <label>X Variable</label>
+                  <select id="corrVarX">${DataManager.getVariableOptions()}</select>
+                </div>
+                <div class="form-group">
+                  <label>Y Variable</label>
+                  <select id="corrVarY">
+                    ${AppState.data.headers.map((h, i) =>
+                      `<option value="${i}" ${i === 1 ? 'selected' : ''}>${Utils.escHtml(h)}</option>`
+                    ).join('')}
+                  </select>
+                </div>
+                <button class="btn btn-primary" id="corrCompute">Calculate</button>
               </div>
-              <div class="form-group">
-                <label>Y Variable</label>
-                <select id="corrVarY">
-                  ${AppState.data.headers.map((h, i) =>
-                    `<option value="${i}" ${i === 1 ? 'selected' : ''}>${Utils.escHtml(h)}</option>`
-                  ).join('')}
-                </select>
-              </div>
-              <button class="btn btn-primary" id="corrCompute">Calculate</button>
-            </div>
+            ` : `<p class="text-muted" style="font-size:0.85rem">Load a dataset with at least 2 numeric columns.</p>`}
           </div>
         </div>
+
+        ${!hasData ? Utils.onboardingGuide({
+          steps: [
+            { title: 'Load paired data', desc: 'You need a dataset with <strong>two numeric columns</strong> (e.g., Height and Weight). Go to Data Input or click below.' },
+            { title: 'Select X and Y variables', desc: 'Choose which variable is X (independent) and which is Y (dependent).' },
+            { title: 'Click Calculate', desc: 'View the Pearson correlation coefficient (r), scatterplot, significance test, and interpretation.' }
+          ],
+          exampleKey: 'height-weight',
+          exampleLabel: 'Height vs Weight (25 pairs)'
+        }) : ''}
 
         <div class="card" id="corrChartCard" style="display:none">
           <div class="card-header"><h3>Scatterplot</h3></div>
@@ -53,7 +67,16 @@ window.ModuleCorrelation = {
       </div>
     `;
 
-    $('#corrCompute').addEventListener('click', () => this.compute());
+    const corrBtn = $('#corrCompute');
+    if (corrBtn) corrBtn.addEventListener('click', () => this.compute());
+
+    Utils.bindGuideButtons(container, () => {
+      UI.switchModule('correlation');
+      setTimeout(() => {
+        const btn = $('#corrCompute');
+        if (btn) btn.click();
+      }, 100);
+    });
   },
 
   compute() {

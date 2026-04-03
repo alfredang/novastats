@@ -114,6 +114,73 @@ window.Utils = {
       return { reject: true, text: `Reject H\u2080 (p = ${this.pFmt(p)} < \u03B1 = ${alpha})` };
     }
     return { reject: false, text: `Fail to reject H\u2080 (p = ${this.pFmt(p)} \u2265 \u03B1 = ${alpha})` };
+  },
+
+  /* ===== ONBOARDING / GUIDE HELPERS ===== */
+
+  onboardingGuide(opts) {
+    // opts: { module, title, description, steps[], exampleKey, exampleLabel, dataNeeds }
+    return `
+      <div class="card onboarding-guide">
+        <div class="card-header">
+          <h3>How to Use</h3>
+        </div>
+        <div class="card-body">
+          <div class="guide-steps">
+            ${opts.steps.map((step, i) => `
+              <div class="guide-step">
+                <div class="guide-step-number">${i + 1}</div>
+                <div class="guide-step-content">
+                  <div class="guide-step-title">${step.title}</div>
+                  <div class="guide-step-desc">${step.desc}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+          ${opts.exampleKey ? `
+            <div class="guide-action">
+              <button class="btn btn-primary guide-load-btn" data-example="${opts.exampleKey}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Try with ${opts.exampleLabel || 'Example Data'}
+              </button>
+              <span class="text-muted" style="font-size:0.8rem">Loads sample data and runs the analysis automatically</span>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  },
+
+  noDataWarning(moduleName, exampleKey, exampleLabel) {
+    return `
+      <div class="banner banner-warning" style="margin-bottom:16px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>No data loaded yet.
+          <button class="btn btn-sm btn-secondary guide-load-btn" data-example="${exampleKey}" style="margin-left:8px">
+            Load ${exampleLabel || 'Example'}
+          </button>
+          or go to <button class="btn btn-sm btn-ghost guide-nav-btn" data-module="data-input">Data Input</button> to add your own.
+        </span>
+      </div>
+    `;
+  },
+
+  bindGuideButtons(container, afterLoad) {
+    if (!container) return;
+    container.querySelectorAll('.guide-load-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.example;
+        DataManager.loadExample(key);
+        UI.renderDataInputPanel();
+        Utils.toast(`Loaded: ${DataManager.EXAMPLES[key].name}`, 'success');
+        if (afterLoad) afterLoad();
+      });
+    });
+    container.querySelectorAll('.guide-nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        UI.switchModule(btn.dataset.module);
+      });
+    });
   }
 };
 

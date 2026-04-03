@@ -5,13 +5,26 @@ window.ModuleHypothesis = {
   currentSubTab: 'z-one',
 
   render(container) {
+    const hasData = AppState.hasData();
     container.innerHTML = `
       <div class="module-header">
         <h2>Hypothesis Testing</h2>
         <p>Perform z-tests and t-tests to make inferences about population parameters.</p>
       </div>
+      ${!hasData ? Utils.noDataWarning('hypothesis', 'exam-scores', 'Exam Scores') : ''}
 
-      <div class="card" style="margin-bottom:20px">
+      ${!hasData ? Utils.onboardingGuide({
+        steps: [
+          { title: 'Load your sample data', desc: 'You need <strong>one or two numeric variables</strong>. For one-sample tests, one column is enough. For two-sample or paired tests, you need two columns.' },
+          { title: 'Choose test type', desc: 'Pick from <strong>Z-Test</strong> (known population SD) or <strong>T-Test</strong> (unknown SD). Then select one-sample, two-sample, or paired.' },
+          { title: 'Set parameters', desc: 'Enter the hypothesized mean (\u03BC\u2080), significance level (\u03B1), and tail direction. Then click <strong>Test</strong>.' },
+          { title: 'Read the verdict', desc: 'View the test statistic, p-value, critical value, normal curve, and a clear <strong>reject / fail to reject</strong> decision.' }
+        ],
+        exampleKey: 'exam-scores',
+        exampleLabel: 'Exam Scores (30 values)'
+      }) : ''}
+
+      <div class="card" style="margin-bottom:20px"${!hasData ? ' hidden' : ''}>
         <div class="sub-tabs" id="hypTabs">
           <button class="sub-tab active" data-tab="z-one">Z-Test (1 Sample)</button>
           <button class="sub-tab" data-tab="z-two">Z-Test (2 Sample)</button>
@@ -241,24 +254,40 @@ window.ModuleHypothesis = {
       </div>
     `;
 
-    // Tab switching
-    $$('#hypTabs .sub-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        $$('#hypTabs .sub-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        $$('.sub-panel').forEach(p => p.classList.remove('active'));
-        const panel = document.getElementById(`panel-${tab.dataset.tab}`);
-        if (panel) panel.classList.add('active');
-        this.currentSubTab = tab.dataset.tab;
+    if (hasData) {
+      // Tab switching
+      $$('#hypTabs .sub-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          $$('#hypTabs .sub-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          $$('.sub-panel').forEach(p => p.classList.remove('active'));
+          const panel = document.getElementById(`panel-${tab.dataset.tab}`);
+          if (panel) panel.classList.add('active');
+          this.currentSubTab = tab.dataset.tab;
+        });
       });
-    });
 
-    // Compute buttons
-    $('#zOneCompute').addEventListener('click', () => this.runZOne());
-    $('#zTwoCompute').addEventListener('click', () => this.runZTwo());
-    $('#tOneCompute').addEventListener('click', () => this.runTOne());
-    $('#tTwoCompute').addEventListener('click', () => this.runTTwo());
-    $('#tPairedCompute').addEventListener('click', () => this.runTPaired());
+      // Compute buttons
+      $('#zOneCompute').addEventListener('click', () => this.runZOne());
+      $('#zTwoCompute').addEventListener('click', () => this.runZTwo());
+      $('#tOneCompute').addEventListener('click', () => this.runTOne());
+      $('#tTwoCompute').addEventListener('click', () => this.runTTwo());
+      $('#tPairedCompute').addEventListener('click', () => this.runTPaired());
+    }
+
+    Utils.bindGuideButtons(container, () => {
+      UI.switchModule('hypothesis');
+      setTimeout(() => {
+        const tab = document.querySelector('[data-tab="t-one"]');
+        if (tab) tab.click();
+        setTimeout(() => {
+          const mu = $('#tOneMu');
+          if (mu) mu.value = '85';
+          const btn = $('#tOneCompute');
+          if (btn) btn.click();
+        }, 100);
+      }, 100);
+    });
   },
 
   displayResult(result) {

@@ -3,22 +3,36 @@
 window.ModuleAnova = {
 
   render(container) {
+    const hasData = AppState.hasData();
     container.innerHTML = `
       <div class="module-header">
         <h2>One-Way ANOVA</h2>
         <p>Compare means across three or more groups to determine if there are statistically significant differences.</p>
       </div>
+      ${!hasData ? Utils.noDataWarning('anova', 'treatment-groups', 'Treatment Groups') : ''}
       <div class="module-grid">
         <div class="card">
           <div class="card-header"><h3>Group Selection</h3></div>
           <div class="card-body">
-            <p class="text-secondary" style="font-size:0.85rem;margin-bottom:12px">
-              Select 2 or more variables. Each variable represents one group.
-            </p>
-            <div id="anovaVarList"></div>
-            <button class="btn btn-primary" id="anovaCompute" style="margin-top:12px">Run ANOVA</button>
+            ${hasData ? `
+              <p class="text-secondary" style="font-size:0.85rem;margin-bottom:12px">
+                Select 2 or more variables. Each variable represents one group.
+              </p>
+              <div id="anovaVarList"></div>
+              <button class="btn btn-primary" id="anovaCompute" style="margin-top:12px">Run ANOVA</button>
+            ` : `<p class="text-muted" style="font-size:0.85rem">Load a dataset with 2+ groups (columns) to compare.</p>`}
           </div>
         </div>
+
+        ${!hasData ? Utils.onboardingGuide({
+          steps: [
+            { title: 'Load group data', desc: 'You need <strong>2 or more columns</strong>, where each column represents a different group (e.g., Control, Drug A, Drug B).' },
+            { title: 'Select groups', desc: 'Check the boxes next to the groups you want to compare. You can select any combination of 2+ groups.' },
+            { title: 'Run ANOVA', desc: 'View the full ANOVA table (SS, df, MS, F, p-value), group means bar chart, effect size (\u03B7\u00B2), and interpretation.' }
+          ],
+          exampleKey: 'treatment-groups',
+          exampleLabel: 'Treatment Groups (3 groups)'
+        }) : ''}
 
         <div class="card" id="anovaChartCard" style="display:none">
           <div class="card-header"><h3>Group Comparison</h3></div>
@@ -47,8 +61,18 @@ window.ModuleAnova = {
       </div>
     `;
 
-    this.buildVarCheckboxes();
-    $('#anovaCompute').addEventListener('click', () => this.compute());
+    if (hasData) {
+      this.buildVarCheckboxes();
+      $('#anovaCompute').addEventListener('click', () => this.compute());
+    }
+
+    Utils.bindGuideButtons(container, () => {
+      UI.switchModule('anova');
+      setTimeout(() => {
+        const btn = $('#anovaCompute');
+        if (btn) btn.click();
+      }, 100);
+    });
   },
 
   buildVarCheckboxes() {

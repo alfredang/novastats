@@ -8,17 +8,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const themeBtn = $('#themeToggle');
   if (themeBtn) themeBtn.addEventListener('click', () => UI.toggleTheme());
 
-  // Sidebar navigation
+  // Sidebar navigation — update hash on click
   $$('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
-      UI.switchModule(item.dataset.module);
+      const mod = item.dataset.module;
+      window.location.hash = mod === 'data-input' ? '' : mod;
+      UI.switchModule(mod);
     });
   });
 
-  // Mobile tab navigation
+  // Mobile tab navigation — update hash on click
   $$('.mobile-tab').forEach(tab => {
     tab.addEventListener('click', () => {
-      UI.switchModule(tab.dataset.module);
+      const mod = tab.dataset.module;
+      window.location.hash = mod === 'data-input' ? '' : mod;
+      UI.switchModule(mod);
     });
   });
 
@@ -43,9 +47,37 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Render data input panel (default view)
+  // Render data input panel (always available)
   UI.renderDataInputPanel();
-  UI.switchModule('data-input');
+
+  // Hash-based routing: support URLs like /novastats/#regression or /novastats/regression
+  const routeFromURL = () => {
+    // Check hash first: #regression, #correlation, etc.
+    let route = window.location.hash.replace('#', '').replace('/', '').trim();
+
+    // Also check pathname for /novastats/regression style URLs
+    if (!route) {
+      const path = window.location.pathname;
+      const segments = path.split('/').filter(Boolean);
+      // Last segment might be a module name (ignore 'novastats', 'index.html')
+      const last = segments[segments.length - 1];
+      if (last && last !== 'novastats' && !last.includes('.html') && UI.modules[last]) {
+        route = last;
+      }
+    }
+
+    return route && UI.modules[route] ? route : 'data-input';
+  };
+
+  // Navigate to initial route
+  const initialModule = routeFromURL();
+  UI.switchModule(initialModule);
+
+  // Handle browser back/forward
+  window.addEventListener('hashchange', () => {
+    const mod = routeFromURL();
+    UI.switchModule(mod);
+  });
 
   // Listen for data changes to refresh active module
   AppState.onUpdate((type) => {
