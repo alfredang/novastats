@@ -179,6 +179,24 @@ window.ChartRenderer = {
       ctx.setLineDash([]);
     }
 
+    // Curve overlay (e.g., quadratic, exponential, logistic)
+    if (typeof opts.curveFn === 'function') {
+      const rxMin = xTicks[0], rxMax = xTicks[xTicks.length - 1];
+      const steps = 80;
+      ctx.strokeStyle = c.colors[1];
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let s = 0; s <= steps; s++) {
+        const xv = rxMin + (rxMax - rxMin) * (s / steps);
+        const yv = opts.curveFn(xv);
+        if (!isFinite(yv)) continue;
+        const px = this.mapX(xv, rxMin, rxMax, w, pad);
+        const py = this.mapY(yv, yTicks[0], yTicks[yTicks.length - 1], h, pad);
+        if (s === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+    }
+
     // Title
     if (opts.title) {
       ctx.fillStyle = c.text;

@@ -1,2 +1,5 @@
 .playwright-mcp/
 .claude/
+
+# Local UI test screenshots (root-level only; keep screenshots/ folder)
+/*.png

@@ -272,6 +272,75 @@
   border-radius: var(--radius-sm);
 }
 
+/* Hypothesis sidebar */
+.hyp-cat { margin-bottom: 8px; }
+.hyp-cat-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  text-align: left;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-fast);
+}
+.hyp-cat-toggle:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--bg-elevated));
+}
+.hyp-cat-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.hyp-cat-toggle::after {
+  content: '';
+  margin-left: auto;
+  font-size: 0.7rem;
+  opacity: 0.6;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.hyp-cat-toggle:hover::after { content: 'click to toggle'; opacity: 0.7; }
+.hyp-cat-list { display: flex !important; flex-direction: column !important; gap: 2px; margin-top: 4px; }
+.hyp-cat-list.collapsed { display: none !important; }
+.hyp-test-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 6px 10px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  border-radius: 4px;
+  border-left: 2px solid transparent;
+  background: transparent;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+  cursor: pointer;
+}
+.hyp-test-btn:hover { background: var(--bg-elevated); color: var(--text-primary); }
+.hyp-test-btn.active {
+  color: var(--accent);
+  background: var(--bg-elevated);
+  border-left-color: var(--accent);
+  font-weight: 500;
+}
+.hyp-link-btn { font-style: italic; opacity: 0.85; }
+@media (max-width: 720px) {
+  .hyp-sidebar { flex: 1 1 100% !important; border-right: none !important; border-bottom: 1px solid var(--border); padding-right: 0 !important; padding-bottom: 12px; }
+}
+
 /* Sub-tabs within modules */
 .sub-tabs {
   display: flex;

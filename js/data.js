@@ -36,6 +36,27 @@ window.DataManager = {
         [45, 35, 20, 50, 30],
         [36, 36, 36, 36, 36]
       ]
+    },
+    'logistic-pass': {
+      name: 'Pass/Fail vs Hours Studied',
+      description: 'Hours studied (X) and binary pass/fail outcome (Y) — for logistic regression',
+      headers: ['Hours', 'Pass'],
+      data: [
+        [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 4.0, 4.25, 4.5, 4.75, 5.0, 5.5],
+        [0,    0,    0,   0,    0,   0,    1,   0,    1,   0,    1,   1,    1,   1,    1,   1,    1,   1,   1]
+      ]
+    },
+    'likert-scale': {
+      name: 'Likert Scale (Cronbach)',
+      description: '5 survey items × 12 respondents (1–5 scale) — for Cronbach\'s alpha',
+      headers: ['Item1', 'Item2', 'Item3', 'Item4', 'Item5'],
+      data: [
+        [4, 5, 3, 4, 2, 5, 4, 3, 5, 4, 3, 4],
+        [4, 4, 3, 5, 2, 5, 4, 3, 5, 4, 2, 4],
+        [3, 5, 4, 4, 3, 4, 5, 2, 5, 3, 3, 5],
+        [4, 5, 3, 5, 2, 5, 4, 3, 5, 4, 3, 4],
+        [5, 4, 3, 4, 3, 5, 5, 2, 4, 4, 3, 5]
+      ]
     }
   },
 
