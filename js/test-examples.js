@@ -50,6 +50,22 @@ window.TestExamples = {
   'outliers':{ dataset: 'exam-scores',    selects: { 'outVar': 0 },                  click: 'outCompute' },
   'fisher':  { inputs: { 'fishA': 10, 'fishB': 2, 'fishC': 3, 'fishD': 15 },         click: 'fishCompute' },
 
+  /* ===== ANOVA VARIANTS ===== */
+  'one-way':  { dataset: 'treatment-groups', multiCheck: 'anovaVars',  click: 'anovaCompute' },
+  'welch':    { dataset: 'treatment-groups', multiCheck: 'welchVars',  click: 'welchCompute' },
+  'two-way':  { dataset: 'two-factor', selects: { 'twAvar': 0, 'twBvar': 1, 'twYvar': 2 }, click: 'twCompute' },
+  'rm':       { dataset: 'treatment-groups', multiCheck: 'rmVars',     click: 'rmCompute' },
+
+  /* ===== CHI-SQUARE VARIANTS ===== */
+  'chi-indep': { click: 'chiLoadExample', followUp: 'chiIndepCompute' },
+  'chi-gof':   { dataset: 'survey-responses', selects: { 'chiGofObs': 0, 'chiGofExp': 1 }, click: 'chiGofCompute' },
+
+  /* ===== BAYESIAN ===== */
+  'bayes':    { inputs: { 'bayesPrior': 0.01, 'bayesLik': 0.95, 'bayesFp': 0.05 }, click: 'bayesCompute' },
+  'beta-bin': { inputs: { 'bbAlpha': 2, 'bbBeta': 5, 'bbK': 7, 'bbN': 10 }, click: 'bbCompute' },
+  'mle':      { dataset: 'exam-scores', selects: { 'mleVar': 0 }, click: 'mleCompute' },
+  'map':      { dataset: 'exam-scores', selects: { 'mapVar': 0 }, inputs: { 'mapAlpha': 2, 'mapBeta': 2 }, click: 'mapCompute' },
+
   /* ===== REGRESSION ===== */
   'linear':     { dataset: 'height-weight', selects: { 'regVarX': 0, 'regVarY': 1 },             click: 'regCompute' },
   'multiple':   { dataset: 'treatment-groups', multiCheck: 'multiPredictors', selects: { 'multiVarY': 2 }, click: 'multiCompute' },
@@ -103,6 +119,12 @@ window.runTestExample = function(toolId) {
     if (ex.click) {
       const btn = document.getElementById(ex.click);
       if (btn) btn.click();
+    }
+    if (ex.followUp) {
+      setTimeout(() => {
+        const btn = document.getElementById(ex.followUp);
+        if (btn) btn.click();
+      }, 100);
     }
   };
 

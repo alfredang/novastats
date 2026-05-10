@@ -46,6 +46,17 @@ window.DataManager = {
         [0,    0,    0,   0,    0,   0,    1,   0,    1,   0,    1,   1,    1,   1,    1,   1,    1,   1,   1]
       ]
     },
+    'two-factor': {
+      name: 'Two-Factor Yield (2×3 design)',
+      description: 'Yield (Y) by Factor A (2 levels: Low/High) × Factor B (3 levels: Mild/Med/Hot) — for two-way ANOVA',
+      headers: ['FactorA', 'FactorB', 'Yield'],
+      data: [
+        // numeric levels for compatibility with our column model: A: 1=Low, 2=High; B: 1,2,3
+        [1,1,1,2,2,2,1,1,1,2,2,2,1,1,1,2,2,2],
+        [1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3],
+        [12,15,18,14,17,20,11,16,19,13,18,22,12,17,19,15,18,21]
+      ]
+    },
     'likert-scale': {
       name: 'Likert Scale (Cronbach)',
       description: '5 survey items × 12 respondents (1–5 scale) — for Cronbach\'s alpha',

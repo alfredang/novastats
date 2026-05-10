@@ -4,79 +4,85 @@ window.ModuleChiSquare = {
 
   contingencyRows: 2,
   contingencyCols: 2,
+  currentSubTab: 'chi-indep',
 
   render(container) {
     const hasData = AppState.hasData();
     container.innerHTML = `
       <div class="module-header">
         <h2>Chi-Square Tests</h2>
-        <p>Test for independence between categorical variables or goodness-of-fit against expected distributions.</p>
+        <p>Test for independence between categorical variables, or goodness-of-fit against expected frequencies.</p>
       </div>
 
       ${!hasData ? Utils.onboardingGuide({
         steps: [
-          { title: 'Choose a test type', desc: '<strong>Independence</strong>: tests if two categorical variables are related (uses a contingency table). <strong>Goodness-of-Fit</strong>: tests if observed frequencies match expected frequencies.' },
-          { title: 'Enter your data', desc: 'For Independence, fill in the contingency table directly (or click <strong>Load Example</strong>). For Goodness-of-Fit, enter observed and expected values as comma-separated numbers, or load a dataset.' },
-          { title: 'Run the test', desc: 'View \u03C7\u00B2 statistic, p-value, expected frequencies table, observed vs expected bar chart, and the reject/fail to reject decision.' }
+          { title: 'Choose a test type', desc: '<strong>Independence</strong> uses a contingency table; <strong>Goodness-of-Fit</strong> compares observed vs expected counts in one variable.' },
+          { title: 'Enter your data', desc: 'Edit the contingency grid for Independence or paste/load observed & expected vectors for GoF.' },
+          { title: 'Run the test', desc: 'See χ², df, p-value, expected frequencies, and a side-by-side observed-vs-expected chart.' }
         ],
         exampleKey: 'survey-responses',
         exampleLabel: 'Survey Data (5 categories)'
       }) : ''}
 
-      <div class="card" style="margin-bottom:20px">
-        <div class="sub-tabs" id="chiTabs">
-          <button class="sub-tab active" data-tab="chi-indep">Test of Independence</button>
-          <button class="sub-tab" data-tab="chi-gof">Goodness-of-Fit</button>
-        </div>
-
-        <!-- Independence Test -->
-        <div class="sub-panel active" id="panel-chi-indep">
-          <div class="contingency-controls">
-            <label>Rows:</label>
-            <input type="number" id="chiRows" value="2" min="2" max="10">
-            <label>Columns:</label>
-            <input type="number" id="chiCols" value="2" min="2" max="10">
-            <button class="btn btn-secondary btn-sm" id="chiUpdateGrid">Update Grid</button>
-            <button class="btn btn-ghost btn-sm" id="chiLoadExample">Load Example</button>
-          </div>
-          <div class="data-grid-wrapper" style="margin:12px 0">
-            <div id="chiGrid"></div>
-          </div>
-          <button class="btn btn-primary" id="chiIndepCompute">Run Test</button>
-        </div>
-
-        <!-- Goodness-of-Fit -->
-        <div class="sub-panel" id="panel-chi-gof">
-          <p class="text-secondary" style="font-size:0.85rem;margin-bottom:12px">
-            Enter observed and expected frequencies. Use variables from your data or enter manually.
-          </p>
-          <div class="var-selector">
-            <div class="form-group">
-              <label>Observed (Variable)</label>
-              <select id="chiGofObs">
-                <option value="-1">-- Enter manually --</option>
-                ${DataManager.getVariableOptions()}
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Expected (Variable)</label>
-              <select id="chiGofExp">
-                <option value="-1">-- Enter manually --</option>
-                ${AppState.data.headers.map((h, i) =>
-                  `<option value="${i}" ${i === 1 ? 'selected' : ''}>${Utils.escHtml(h)}</option>`
-                ).join('')}
-              </select>
+      <div class="card hyp-layout" style="margin-bottom:20px;display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+        <aside class="hyp-sidebar" style="flex:0 0 220px;min-width:200px;border-right:1px solid var(--border);padding-right:12px">
+          <div class="hyp-cat">
+            <button type="button" class="hyp-cat-toggle" data-cat="chi-types">▾ Chi-Square Variants</button>
+            <div class="hyp-cat-list" data-cat-list="chi-types">
+              <button class="hyp-test-btn active" data-tab="chi-indep">Test of Independence</button>
+              <button class="hyp-test-btn" data-tab="chi-gof">Goodness-of-Fit</button>
             </div>
           </div>
-          <div class="form-group">
-            <label>Observed values (comma-separated)</label>
-            <input type="text" id="chiGofObsInput" placeholder="e.g., 45, 35, 20, 50, 30">
+        </aside>
+
+        <div class="hyp-content" style="flex:1;min-width:300px">
+          <div class="sub-panel active" id="panel-chi-indep">
+            <div class="contingency-controls">
+              <label>Rows:</label>
+              <input type="number" id="chiRows" value="2" min="2" max="10">
+              <label>Columns:</label>
+              <input type="number" id="chiCols" value="2" min="2" max="10">
+              <button class="btn btn-secondary btn-sm" id="chiUpdateGrid">Update Grid</button>
+              <button class="btn btn-ghost btn-sm" id="chiLoadExample">Load Example</button>
+            </div>
+            <div class="data-grid-wrapper" style="margin:12px 0">
+              <div id="chiGrid"></div>
+            </div>
+            <button class="btn btn-primary" id="chiIndepCompute">Run Test</button>
           </div>
-          <div class="form-group">
-            <label>Expected values (comma-separated)</label>
-            <input type="text" id="chiGofExpInput" placeholder="e.g., 36, 36, 36, 36, 36">
+
+          <div class="sub-panel" id="panel-chi-gof">
+            <p class="text-secondary" style="font-size:0.85rem;margin-bottom:12px">
+              Enter observed and expected frequencies. Pick from data columns or enter manually.
+            </p>
+            <div class="var-selector">
+              <div class="form-group">
+                <label>Observed (Variable)</label>
+                <select id="chiGofObs">
+                  <option value="-1">-- Enter manually --</option>
+                  ${hasData ? DataManager.getVariableOptions() : ''}
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Expected (Variable)</label>
+                <select id="chiGofExp">
+                  <option value="-1">-- Enter manually --</option>
+                  ${hasData ? AppState.data.headers.map((h, i) =>
+                    `<option value="${i}" ${i === 1 ? 'selected' : ''}>${Utils.escHtml(h)}</option>`
+                  ).join('') : ''}
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Observed values (comma-separated)</label>
+              <input type="text" id="chiGofObsInput" placeholder="e.g., 45, 35, 20, 50, 30">
+            </div>
+            <div class="form-group">
+              <label>Expected values (comma-separated)</label>
+              <input type="text" id="chiGofExpInput" placeholder="e.g., 36, 36, 36, 36, 36">
+            </div>
+            <button class="btn btn-primary" id="chiGofCompute">Run Test</button>
           </div>
-          <button class="btn btn-primary" id="chiGofCompute">Run Test</button>
         </div>
       </div>
 
@@ -108,23 +114,39 @@ window.ModuleChiSquare = {
       </div>
     `;
 
-    // Tab switching
-    $$('#chiTabs .sub-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        $$('#chiTabs .sub-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        $$('#panel-chi-indep, #panel-chi-gof').forEach(p => p.classList.remove('active'));
-        $(`#panel-${tab.dataset.tab}`).classList.add('active');
+    // Sidebar
+    container.querySelectorAll('.hyp-test-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.dataset.goto) { UI.switchModule(btn.dataset.goto); return; }
+        container.querySelectorAll('.hyp-test-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        container.querySelectorAll('.sub-panel').forEach(p => p.classList.remove('active'));
+        const panel = container.querySelector(`#panel-${btn.dataset.tab}`);
+        if (panel) panel.classList.add('active');
+        this.currentSubTab = btn.dataset.tab;
       });
     });
+    const setOpen = (toggle, list, open) => {
+      list.classList.toggle('collapsed', !open);
+      toggle.textContent = (open ? '▾ ' : '▸ ') + toggle.textContent.slice(2);
+    };
+    container.querySelectorAll('.hyp-cat-toggle').forEach(t => {
+      const list = container.querySelector(`[data-cat-list="${t.dataset.cat}"]`);
+      if (!list) return;
+      const containsActive = !!list.querySelector('.hyp-test-btn.active');
+      setOpen(t, list, containsActive);
+      t.addEventListener('click', () => setOpen(t, list, list.classList.contains('collapsed')));
+    });
 
-    // Update GoF inputs from variable selection
-    $('#chiGofObs').addEventListener('change', () => {
-      const idx = parseInt($('#chiGofObs').value);
+    // GoF select handlers
+    const obsSel = $('#chiGofObs');
+    if (obsSel) obsSel.addEventListener('change', () => {
+      const idx = parseInt(obsSel.value);
       if (idx >= 0) $('#chiGofObsInput').value = AppState.getColumn(idx).join(', ');
     });
-    $('#chiGofExp').addEventListener('change', () => {
-      const idx = parseInt($('#chiGofExp').value);
+    const expSel = $('#chiGofExp');
+    if (expSel) expSel.addEventListener('change', () => {
+      const idx = parseInt(expSel.value);
       if (idx >= 0) $('#chiGofExpInput').value = AppState.getColumn(idx).join(', ');
     });
 
@@ -148,6 +170,7 @@ window.ModuleChiSquare = {
         }, 100);
       }, 100);
     });
+    if (typeof injectExampleButtons === 'function') injectExampleButtons(container);
   },
 
   buildContingencyGrid() {
@@ -231,7 +254,7 @@ window.ModuleChiSquare = {
     $('#chiTestType').textContent = result.testType;
 
     const metrics = [
-      { label: '\u03C7\u00B2', value: Utils.fmt(result.chi2) },
+      { label: 'χ²', value: Utils.fmt(result.chi2) },
       { label: 'df', value: result.df },
       { label: 'p-value', value: Utils.pFmt(result.pValue) },
       { label: 'Critical Value', value: Utils.fmt(result.critValue) }
@@ -248,7 +271,6 @@ window.ModuleChiSquare = {
     decBox.textContent = result.decision;
     decBox.className = `decision-box ${result.reject ? 'reject' : 'fail-to-reject'}`;
 
-    // Expected frequencies table (independence only)
     if (result.expected && observed2D) {
       let tbl = '<h4 style="margin:12px 0 8px;font-size:0.85rem">Expected Frequencies:</h4>';
       tbl += '<table class="data-table result-table"><thead><tr><th></th>';
@@ -266,30 +288,27 @@ window.ModuleChiSquare = {
     }
 
     $('#chiInterpretation').innerHTML = `
-      The ${result.testType.toLowerCase()} yielded \u03C7\u00B2 = <strong>${Utils.fmt(result.chi2)}</strong>
+      The ${result.testType.toLowerCase()} yielded χ² = <strong>${Utils.fmt(result.chi2)}</strong>
       with <strong>${result.df}</strong> degrees of freedom and a p-value of
       <strong>${Utils.pFmt(result.pValue)}</strong>.
       ${result.reject
-        ? 'We <strong>reject the null hypothesis</strong>. There is a statistically significant difference.'
-        : 'We <strong>fail to reject the null hypothesis</strong>. No significant difference was found.'}
-    `;
+        ? 'We <strong>reject H₀</strong>: a statistically significant difference exists.'
+        : 'We <strong>fail to reject H₀</strong>: no significant difference detected.'}
+    ` + (typeof renderExplanation === 'function' ? renderExplanation(this.currentSubTab) : '');
 
     $('#chiSteps').innerHTML = result.steps.map(s =>
       `<div class="step-line">${Utils.escHtml(s)}</div>`
     ).join('');
 
-    // Chart
     const canvas = document.getElementById('chiChart');
     const w = canvas.parentElement.clientWidth - 32;
 
     if (obsArr && expArr) {
-      // GoF: grouped bar
       const labels = obsArr.map((_, i) => `Cat ${i + 1}`);
       ChartRenderer.groupedBarChart(canvas, labels, [obsArr, expArr], ['Observed', 'Expected'], {
         width: w, height: 280, title: 'Observed vs Expected'
       });
     } else if (observed2D && result.expected) {
-      // Independence: flatten for comparison
       const obsFlat = observed2D.flat();
       const expFlat = result.expected.flat();
       const labels = [];

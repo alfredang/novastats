@@ -572,6 +572,88 @@ window.Explanations = {
       'Beware extrapolation — quadratic curves grow rapidly outside the data range.'
     ]
   },
+  /* ===== ANOVA VARIANTS ===== */
+  'one-way': {
+    title: 'One-way ANOVA',
+    intro: "This One-way ANOVA calculator compares means across 3 or more independent groups in a single test. For example, you could compare average yield across multiple manufacturing lines or test scores across teaching methods.",
+    definition: 'A test of whether three or more group means are equal, partitioning total variance into between-group and within-group components.',
+    formula: 'F = MS_between / MS_within; df = (k−1, N−k)',
+    interpretation: ['Reject H₀ if F > critical F (or p < α): at least one group differs.', 'Eta-squared η² = SS_between/SS_total measures proportion of variance explained.'],
+    considerations: ['Assumes normality, independence, and equal variances. For unequal variances use Welch\'s ANOVA.', 'Significant ANOVA tells you something differs but not which pairs — follow up with Tukey HSD.']
+  },
+  'welch': {
+    title: "Welch's ANOVA",
+    intro: "This Welch's ANOVA calculator is the safer alternative to one-way ANOVA when group variances are unequal. Use it as your default for comparing means across 3+ independent groups when variance homogeneity is doubtful.",
+    definition: 'A modification of one-way ANOVA that does not assume equal variances; uses adjusted F-statistic and approximate degrees of freedom.',
+    interpretation: ['Reject H₀ if p < α — group means differ.', 'Robust to heteroscedasticity (unequal variances).'],
+    considerations: ['Still assumes independence and approximate normality within groups.', 'Follow up with Games-Howell test for pairwise comparisons under unequal variances.']
+  },
+  'two-way': {
+    title: 'Two-way ANOVA',
+    intro: "This Two-way ANOVA calculator analyzes the effect of two categorical factors (and their interaction) on a numeric outcome. For example, study how teaching method AND school type jointly affect exam scores.",
+    definition: 'Factorial ANOVA decomposing variance into main effect of A, main effect of B, A×B interaction, and within-cell error.',
+    formula: 'F_X = MS_X / MS_within for each effect X ∈ {A, B, A×B}',
+    interpretation: ['Significant interaction → effect of A depends on level of B; interpret main effects with caution.', 'Significant main effect → that factor changes the outcome on average.'],
+    considerations: ['Each cell (combination of A and B levels) needs ≥1 observation; for full power, balance is preferred.', 'For ≥2 within-subjects factors use a mixed/repeated-measures ANOVA instead.']
+  },
+  'rm': {
+    title: 'Repeated Measures ANOVA',
+    intro: "This Repeated Measures ANOVA calculator analyzes within-subject changes across 3+ time points or treatment conditions on the same subjects. For example, compare blood pressure measurements taken before, during, and after a treatment.",
+    definition: 'A within-subjects ANOVA that partitions variance into treatments, subjects, and error — leveraging within-subject correlation for higher power.',
+    formula: 'F = MS_treatments / MS_error; df = (k−1, (n−1)(k−1))',
+    interpretation: ['Reject H₀ if p < α — at least one treatment mean differs.', 'Higher statistical power than between-subjects designs because subject-level variability is removed.'],
+    considerations: ['Assumes sphericity (equal variance of pairwise differences). Apply Greenhouse-Geisser or Huynh-Feldt correction if violated.', 'Each row in the data must represent the same subject across all treatment columns.']
+  },
+  'chi-indep': {
+    title: 'Chi-Square Test of Independence',
+    intro: "This Chi-Square Test of Independence calculator tests whether two categorical variables are statistically associated. For example, you could test if smoking status is related to lung disease occurrence in a survey.",
+    definition: "Tests whether the joint distribution of two categorical variables differs from what would be expected if they were independent.",
+    formula: 'χ² = Σ(Oᵢⱼ − Eᵢⱼ)² / Eᵢⱼ; df = (rows−1)(cols−1); E = row total × col total / N',
+    interpretation: ['Reject H₀ if p < α — variables are associated.', "Pair with Cramér's V for effect size."],
+    considerations: ['All expected counts should be ≥5 for the chi-square approximation to be reliable.', "For 2×2 tables with small expected counts, use Fisher's Exact Test instead."]
+  },
+  'chi-gof': {
+    title: 'Chi-Square Goodness-of-Fit',
+    intro: "This Chi-Square Goodness-of-Fit calculator tests whether observed category frequencies match a hypothesized distribution. For example, test whether dice rolls are uniform or whether observed genotype frequencies match Hardy-Weinberg expectations.",
+    definition: 'Tests whether an observed frequency distribution differs from an expected (theoretical) distribution.',
+    formula: 'χ² = Σ(Oᵢ − Eᵢ)² / Eᵢ; df = k − 1 (or k − 1 − p where p is parameters estimated)',
+    interpretation: ['Reject H₀ if p < α — observed counts deviate significantly from expected.'],
+    considerations: ['Each expected count should be ≥5; combine sparse categories if needed.', 'Sum of expected frequencies should equal sum of observed (rescale if necessary).']
+  },
+
+  /* ===== BAYESIAN ===== */
+  'bayes': {
+    title: "Bayes' Theorem",
+    intro: "This Bayes' Theorem calculator updates the probability of a hypothesis given new evidence. The classic example: given a 95%-sensitive medical test and a low disease prevalence, what is the probability you actually have the disease if you test positive? The answer is often surprisingly low.",
+    definition: 'Bayes\' theorem updates a prior probability given new evidence and the likelihood of that evidence under both hypotheses.',
+    formula: 'P(H|E) = P(E|H) · P(H) / P(E),  where P(E) = P(E|H)P(H) + P(E|¬H)P(¬H)',
+    interpretation: ['Posterior P(H|E) is your updated belief after seeing the evidence.', 'Bayes Factor = P(E|H)/P(E|¬H) measures the strength of evidence for H.'],
+    considerations: ['Sensitive to the prior — different priors give different posteriors.', 'Assumes conditional probabilities are well-calibrated.']
+  },
+  'beta-bin': {
+    title: 'Beta-Binomial Posterior',
+    intro: "This Beta-Binomial Posterior calculator performs a conjugate Bayesian update on a proportion. Start with a Beta(α, β) prior on p, observe k successes in n trials, and get the posterior Beta(α+k, β+n−k) in closed form. Useful for Bayesian A/B testing and proportion estimation.",
+    definition: 'The Beta distribution is the conjugate prior for the Bernoulli/binomial likelihood. The posterior is itself Beta with updated parameters.',
+    formula: 'Prior Beta(α, β) + Data (k of n) → Posterior Beta(α+k, β+n−k)',
+    interpretation: ['Posterior mean balances prior mean and the MLE k/n.', 'As n grows, the posterior concentrates around the MLE, washing out the prior.'],
+    considerations: ['Beta(1, 1) is the uniform (uninformative) prior.', 'Strong priors with large α+β can dominate small samples.']
+  },
+  'mle': {
+    title: 'Maximum Likelihood Estimation',
+    intro: "This Maximum Likelihood (MLE) calculator finds the parameters that make the observed data most probable under a chosen distribution (Normal, Exponential, Poisson, or Bernoulli). MLE is the foundational estimation method in classical (frequentist) statistics.",
+    definition: 'MLE selects parameter values that maximize the joint probability (likelihood) of the observed data.',
+    interpretation: ['MLE is consistent and asymptotically normal under regularity conditions.', 'Log-likelihood values let you compare fits between different parameter values.'],
+    considerations: ['MLE can be biased in small samples (e.g., normal MLE σ̂² uses 1/n, not 1/(n−1)).', 'For Bernoulli data, encode outcomes as 0/1.']
+  },
+  'map': {
+    title: 'Maximum A Posteriori Estimation',
+    intro: "This MAP calculator finds the parameter value that maximizes the posterior — i.e., combines a prior belief with the data likelihood. For example, estimate a proportion using a Beta prior, or estimate a mean with a normal prior on μ. MAP is the Bayesian counterpart to MLE.",
+    definition: 'MAP estimates parameters by maximizing posterior probability = likelihood × prior.',
+    formula: 'θ̂_MAP = argmax_θ [ p(data|θ) · p(θ) ]',
+    interpretation: ['MAP equals MLE when the prior is flat (uniform).', 'Strong priors pull MAP toward the prior mode; weak priors leave it close to MLE.'],
+    considerations: ['For Beta-Binomial: MAP mode = (α+k−1)/(α+β+n−2) when α+k>1 and β+(n−k)>1.', 'For Normal mean with normal prior, MAP equals the posterior mean (since posterior is normal).']
+  },
+
   'logistic': {
     title: 'Logistic Regression',
     intro: 'This Logistic Regression calculator models the probability of a binary outcome (0/1) given one or more predictors. Use it for classification problems and to obtain interpretable odds ratios for each predictor.',

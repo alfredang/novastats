@@ -84,13 +84,17 @@ window.ModuleHypothesis = {
             <div class="hyp-cat-list" data-cat-list="multi-grp">
               <button class="hyp-test-btn" data-tab="kw">Kruskal-Wallis Test</button>
               <button class="hyp-test-btn" data-tab="friedman">Friedman Test</button>
-              <button type="button" class="hyp-test-btn hyp-link-btn" data-goto="anova">One-way ANOVA →</button>
+              <button type="button" class="hyp-test-btn hyp-link-btn" data-goto="anova:one-way">One-way ANOVA →</button>
+              <button type="button" class="hyp-test-btn hyp-link-btn" data-goto="anova:welch">Welch's ANOVA →</button>
+              <button type="button" class="hyp-test-btn hyp-link-btn" data-goto="anova:two-way">Two-way ANOVA →</button>
+              <button type="button" class="hyp-test-btn hyp-link-btn" data-goto="anova:rm">Repeated Measures ANOVA →</button>
             </div>
           </div>
           <div class="hyp-cat">
             <button type="button" class="hyp-cat-toggle" data-cat="categorical">▾ Categorical Tests</button>
             <div class="hyp-cat-list" data-cat-list="categorical">
-              <button type="button" class="hyp-test-btn hyp-link-btn" data-goto="chi-square">Chi-Square (Goodness/Independence) →</button>
+              <button type="button" class="hyp-test-btn hyp-link-btn" data-goto="chi-square:chi-indep">Chi-Square Test of Independence →</button>
+              <button type="button" class="hyp-test-btn hyp-link-btn" data-goto="chi-square:chi-gof">Chi-Square Goodness-of-Fit →</button>
             </div>
           </div>
           <div class="hyp-cat">
@@ -413,8 +417,16 @@ window.ModuleHypothesis = {
     // Sidebar test buttons (always available, even without data so users can browse)
     container.querySelectorAll('.hyp-test-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        // Cross-module link buttons
-        if (btn.dataset.goto) { UI.switchModule(btn.dataset.goto); return; }
+        // Cross-module link buttons. Format "module" or "module:subtab"
+        if (btn.dataset.goto) {
+          const [target, sub] = btn.dataset.goto.split(':');
+          UI.switchModule(target);
+          if (sub) setTimeout(() => {
+            const subBtn = document.querySelector(`#panel-${target} .hyp-test-btn[data-tab="${sub}"]`);
+            if (subBtn) subBtn.click();
+          }, 80);
+          return;
+        }
         container.querySelectorAll('.hyp-test-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         container.querySelectorAll('.sub-panel').forEach(p => p.classList.remove('active'));

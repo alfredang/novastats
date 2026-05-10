@@ -10,6 +10,7 @@ window.UI = {
     'hypothesis': { name: 'Hypothesis', icon: 'check-circle', render: () => ModuleHypothesis.render($('#panel-hypothesis')) },
     'chi-square': { name: 'Chi-Square', icon: 'grid', render: () => ModuleChiSquare.render($('#panel-chi-square')) },
     'anova': { name: 'ANOVA', icon: 'layers', render: () => ModuleAnova.render($('#panel-anova')) },
+    'bayesian': { name: 'Bayesian', icon: 'cpu', render: () => ModuleBayesian.render($('#panel-bayesian')) },
     'ai-insights': { name: 'AI Insights', icon: 'cpu', render: () => AIInsights.render($('#panel-ai-insights')) }
   },
 
