@@ -45,7 +45,6 @@ window.ModuleAnova = {
               <button class="hyp-test-btn active" data-tab="one-way">One-way ANOVA</button>
               <button class="hyp-test-btn" data-tab="welch">Welch's ANOVA</button>
               <button class="hyp-test-btn" data-tab="two-way">Two-way ANOVA</button>
-              <button class="hyp-test-btn" data-tab="rm">Repeated Measures</button>
             </div>
           </div>
         </aside>
@@ -80,12 +79,6 @@ window.ModuleAnova = {
             </div>
           </div>
 
-          <div class="sub-panel" id="panel-rm">
-            <div class="form-group"><label>Treatments (select 2+ paired columns; rows = subjects)</label>
-              <div id="rmVars">${hasData ? this.multiVarOptions() : ''}</div>
-            </div>
-            <button class="btn btn-primary" id="rmCompute">Run Repeated Measures ANOVA</button>
-          </div>
         </div>
       </div>
 
@@ -140,7 +133,6 @@ window.ModuleAnova = {
       bind('anovaCompute', this.runOneWay);
       bind('welchCompute', this.runWelch);
       bind('twCompute', this.runTwoWay);
-      bind('rmCompute', this.runRM);
     }
 
     Utils.bindGuideButtons(container, () => {

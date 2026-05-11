@@ -87,7 +87,6 @@ window.ModuleHypothesis = {
               <button type="button" class="hyp-test-btn hyp-link-btn" data-goto="anova:one-way">One-way ANOVA →</button>
               <button type="button" class="hyp-test-btn hyp-link-btn" data-goto="anova:welch">Welch's ANOVA →</button>
               <button type="button" class="hyp-test-btn hyp-link-btn" data-goto="anova:two-way">Two-way ANOVA →</button>
-              <button type="button" class="hyp-test-btn hyp-link-btn" data-goto="anova:rm">Repeated Measures ANOVA →</button>
             </div>
           </div>
           <div class="hyp-cat">

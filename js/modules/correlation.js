@@ -4,17 +4,20 @@ window.ModuleCorrelation = {
 
   render(container) {
     const hasData = AppState.hasData();
+    const numCols = hasData ? AppState.data.headers.length : 0;
+    const hasPair = hasData && numCols >= 2;
     container.innerHTML = `
       <div class="module-header">
         <h2>Correlation Analysis</h2>
         <p>Measure the strength and direction of the linear relationship between two variables.</p>
       </div>
       ${!hasData ? Utils.noDataWarning('correlation', 'height-weight', 'Height vs Weight') : ''}
+      ${hasData && !hasPair ? `<div class="alert alert-warning" style="margin-bottom:16px">Correlation requires at least <strong>2 columns</strong>. Your current dataset has only <strong>${numCols}</strong> column${numCols === 1 ? '' : 's'}. Load a dataset with paired variables (e.g., Height vs Weight).</div>` : ''}
       <div class="module-grid">
         <div class="card">
           <div class="card-header"><h3>Variable Selection</h3></div>
           <div class="card-body">
-            ${hasData ? `
+            ${hasPair ? `
               <div class="var-selector">
                 <div class="form-group">
                   <label>X Variable</label>
@@ -31,6 +34,7 @@ window.ModuleCorrelation = {
                 <button class="btn btn-primary" id="corrCompute">Calculate</button>
               </div>
             ` : `<p class="text-muted" style="font-size:0.85rem">Load a dataset with at least 2 numeric columns.</p>`}
+            ${hasData && !hasPair ? `<div style="margin-top:12px"><button class="btn btn-secondary" data-load-example="height-weight">Load Height vs Weight example</button></div>` : ''}
           </div>
         </div>
 

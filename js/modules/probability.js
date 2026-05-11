@@ -73,15 +73,23 @@ window.ModuleProbability = {
         </div>
       </div>
 
-      <div class="card" id="probResultsArea" style="display:none">
-        <div class="card-header"><h3 id="probTitle">Results</h3></div>
-        <div class="card-body">
-          <div class="results-grid" id="probGrid"></div>
-          <div class="interpretation" id="probInterp"></div>
-          <details style="margin-top:12px">
-            <summary>Step-by-step</summary>
-            <div class="details-content" id="probSteps"></div>
-          </details>
+      <div class="module-grid" id="probResultsArea" style="display:none">
+        <div class="card" id="probChartCard">
+          <div class="card-header"><h3>Distribution Curve</h3></div>
+          <div class="card-body">
+            <div class="chart-container"><canvas id="probChart"></canvas></div>
+          </div>
+        </div>
+        <div class="card full-width">
+          <div class="card-header"><h3 id="probTitle">Results</h3></div>
+          <div class="card-body">
+            <div class="results-grid" id="probGrid"></div>
+            <div class="interpretation" id="probInterp"></div>
+            <details style="margin-top:12px">
+              <summary>Step-by-step</summary>
+              <div class="details-content" id="probSteps"></div>
+            </details>
+          </div>
         </div>
       </div>
     `;
@@ -165,7 +173,8 @@ window.ModuleProbability = {
         `P(A∪B) = P(A) + P(B) − P(A∩B)`,
         `P(A|B) = P(A∩B) / P(B)`,
         `Independent iff P(A∩B) = P(A)·P(B)`
-      ]
+      ],
+      noChart: true
     });
   },
 
@@ -200,8 +209,111 @@ window.ModuleProbability = {
         `${pdfLabel} at ${dist.discrete ? `k=${x}` : `x=${Utils.fmt(x)}`}: ${Utils.fmt(dist.pdf(x, params))}`,
         `CDF P(X≤${dist.discrete ? x : Utils.fmt(x)}) = ${Utils.fmt(dist.cdf(x, params))}`,
         `Mean = ${Utils.fmt(dist.mean(params))}, Variance = ${Utils.fmt(dist.variance(params))}`
-      ]
+      ],
+      chart: { dist, params, x, title: info.title }
     });
+  },
+
+  drawCurve(canvas, { dist, params, x, title }) {
+    const w = canvas.parentElement.clientWidth - 32;
+    const h = 280;
+    const ctx = ChartRenderer.setupCanvas(canvas, w, h);
+    const pad = { ...ChartRenderer.PAD };
+    ChartRenderer.clear(ctx, w, h);
+
+    const mean = dist.mean(params);
+    const sd = Math.sqrt(dist.variance(params));
+
+    // Choose plot range
+    let xMin, xMax;
+    if (dist.discrete) {
+      // Show 0..mean+4*sd ish, but at least up to x
+      xMin = Math.max(0, Math.floor(Math.min(mean - 4 * sd, x - 2)));
+      xMax = Math.max(Math.ceil(mean + 4 * sd), x + 2, 10);
+      if (params.n) xMax = Math.min(xMax, params.n);
+      if (params.N) xMax = Math.min(xMax, params.N);
+    } else if (params.a != null && params.b != null) {
+      const pad = (params.b - params.a) * 0.1;
+      xMin = params.a - pad; xMax = params.b + pad;
+    } else {
+      xMin = Math.min(mean - 4 * sd, x - sd);
+      xMax = Math.max(mean + 4 * sd, x + sd);
+      // For strictly positive distributions, clamp
+      if (['exponential','gamma','weibull','logNormal','chiSquare','fDist'].some(k => StatsProbability[k] === dist)) xMin = Math.max(0, xMin);
+      if (StatsProbability.beta === dist) { xMin = 0; xMax = 1; }
+      if (!isFinite(xMin) || !isFinite(xMax) || xMin === xMax) { xMin = -3; xMax = 3; }
+    }
+
+    // Build series
+    let xs = [], ys = [];
+    if (dist.discrete) {
+      for (let k = Math.max(0, Math.floor(xMin)); k <= Math.ceil(xMax); k++) {
+        xs.push(k); ys.push(dist.pdf(k, params));
+      }
+    } else {
+      const steps = 200;
+      for (let i = 0; i <= steps; i++) {
+        const xv = xMin + (xMax - xMin) * i / steps;
+        xs.push(xv); ys.push(dist.pdf(xv, params));
+      }
+    }
+    const yMax = Math.max(...ys) * 1.1 || 1;
+
+    const xTicks = ChartRenderer.niceRange(xMin, xMax);
+    const yTicks = ChartRenderer.niceRange(0, yMax);
+    ChartRenderer.drawGrid(ctx, w, h, pad, xTicks, yTicks);
+    ChartRenderer.drawAxes(ctx, w, h, pad, { xLabel: 'x', yLabel: dist.discrete ? 'P(X=k)' : 'f(x)' });
+
+    const c = ChartRenderer.getColors();
+    if (dist.discrete) {
+      // Bar/lollipop
+      ctx.strokeStyle = c.colors[0]; ctx.fillStyle = c.colors[0]; ctx.lineWidth = 2;
+      xs.forEach((xv, i) => {
+        const px = ChartRenderer.mapX(xv, xTicks[0], xTicks[xTicks.length - 1], w, pad);
+        const py0 = ChartRenderer.mapY(0, yTicks[0], yTicks[yTicks.length - 1], h, pad);
+        const py = ChartRenderer.mapY(ys[i], yTicks[0], yTicks[yTicks.length - 1], h, pad);
+        ctx.beginPath(); ctx.moveTo(px, py0); ctx.lineTo(px, py); ctx.stroke();
+        ctx.beginPath(); ctx.arc(px, py, 3, 0, Math.PI * 2); ctx.fill();
+      });
+    } else {
+      // PDF line
+      ctx.strokeStyle = c.colors[0]; ctx.lineWidth = 2; ctx.beginPath();
+      xs.forEach((xv, i) => {
+        const px = ChartRenderer.mapX(xv, xTicks[0], xTicks[xTicks.length - 1], w, pad);
+        const py = ChartRenderer.mapY(ys[i], yTicks[0], yTicks[yTicks.length - 1], h, pad);
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      });
+      ctx.stroke();
+
+      // Shade the area to the left of x (CDF region)
+      ctx.fillStyle = c.colors[0] + '33';
+      ctx.beginPath();
+      const py0 = ChartRenderer.mapY(0, yTicks[0], yTicks[yTicks.length - 1], h, pad);
+      let first = true;
+      xs.forEach((xv, i) => {
+        if (xv > x) return;
+        const px = ChartRenderer.mapX(xv, xTicks[0], xTicks[xTicks.length - 1], w, pad);
+        const py = ChartRenderer.mapY(ys[i], yTicks[0], yTicks[yTicks.length - 1], h, pad);
+        if (first) { ctx.moveTo(px, py0); ctx.lineTo(px, py); first = false; }
+        else ctx.lineTo(px, py);
+      });
+      const lastX = ChartRenderer.mapX(Math.min(x, xs[xs.length - 1]), xTicks[0], xTicks[xTicks.length - 1], w, pad);
+      ctx.lineTo(lastX, py0);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Vertical line at x
+    const px = ChartRenderer.mapX(x, xTicks[0], xTicks[xTicks.length - 1], w, pad);
+    ctx.strokeStyle = c.colors[1] || '#ff9f43'; ctx.setLineDash([4, 3]); ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(px, pad.top); ctx.lineTo(px, h - pad.bottom); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Title
+    ctx.fillStyle = c.text;
+    ctx.font = 'bold 12px -apple-system, system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(title, w / 2, 16);
   },
 
   show(opts) {
@@ -214,5 +326,13 @@ window.ModuleProbability = {
       (typeof renderExplanation === 'function' ? renderExplanation(this.currentSubTab) : '');
     $('#probSteps').innerHTML = (opts.steps || []).map(s =>
       `<div class="step-line">${Utils.escHtml(s)}</div>`).join('');
+
+    const chartCard = $('#probChartCard');
+    if (opts.noChart || !opts.chart) {
+      chartCard.style.display = 'none';
+    } else {
+      chartCard.style.display = '';
+      requestAnimationFrame(() => this.drawCurve($('#probChart'), opts.chart));
+    }
   }
 };
