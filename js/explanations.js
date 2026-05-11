@@ -572,6 +572,91 @@ window.Explanations = {
       'Beware extrapolation — quadratic curves grow rapidly outside the data range.'
     ]
   },
+  /* ===== CONFIDENCE INTERVALS ===== */
+  'ci-mean': {
+    title: 'CI for a Mean',
+    intro: 'This CI for a Mean calculator estimates a range of plausible values for the population mean. Use the z-based interval when σ is known (rare in practice) and the t-based interval otherwise.',
+    definition: 'A range that contains the true population mean with the stated probability under repeated sampling.',
+    formula: 'CI = x̄ ± t·(s/√n)  [t-based]   or   x̄ ± z·(σ/√n)  [σ known]',
+    interpretation: ['Wider CIs reflect more uncertainty (smaller n or larger SD).', '95% does NOT mean "95% probability the mean is in this interval" — it refers to long-run coverage.'],
+    considerations: ['Use t-based CI by default.', 'Requires approximately normal data or n ≥ ~30 by the CLT.']
+  },
+  'ci-proportion': {
+    title: 'CI for a Proportion',
+    intro: 'This CI for a Proportion calculator estimates a population proportion (e.g., a vote share, success rate, or defect rate). Wilson intervals are more reliable than the classic Wald interval, especially for small n or extreme p.',
+    definition: 'A range of plausible values for the true population proportion.',
+    formula: 'Wilson: (p̂ + z²/(2n) ± z·√(p̂(1−p̂)/n + z²/(4n²))) / (1 + z²/n)',
+    interpretation: ['CIs that exclude 0.5 indicate the proportion differs from a 50/50 split.'],
+    considerations: ['Wald CI can have poor coverage when n is small or p is near 0 or 1; Wilson is recommended.']
+  },
+  'ci-sd': {
+    title: 'CI for Standard Deviation',
+    intro: 'This CI for the Standard Deviation calculator uses the chi-square distribution to bound the true population SD. Note that SD CIs are typically asymmetric.',
+    definition: 'A range of plausible values for the population standard deviation (or variance).',
+    formula: 'σ² CI = [(n−1)s² / χ²_{α/2}, (n−1)s² / χ²_{1−α/2}]; SD CI = √(variance CI)',
+    interpretation: ['Strongly dependent on the normality assumption — even moderate non-normality distorts coverage.'],
+    considerations: ['For non-normal data, prefer bootstrap CIs.']
+  },
+  'ci-corr': {
+    title: 'CI for Correlation Coefficient',
+    intro: 'This CI for the Correlation Coefficient calculator uses the Fisher z-transform to build a symmetric interval on the transformed scale, then back-transforms to give an interval for ρ.',
+    definition: 'A range of plausible values for the population Pearson correlation ρ.',
+    formula: 'Fisher z = ½ ln((1+r)/(1−r));  z-CI: z ± z_{α/2}/√(n−3); back-transform to r.',
+    interpretation: ['CIs that exclude 0 indicate a statistically detectable linear relationship.'],
+    considerations: ['Assumes bivariate normality and a linear relationship.', 'For ranked or non-linear data, consider Spearman.']
+  },
+  'ci-diff-means': {
+    title: 'CI for Difference in Means',
+    intro: 'This CI for Difference in Means calculator estimates the range of plausible values for μ₁ − μ₂ between two independent samples. Uses Welch\'s degrees of freedom so unequal variances are handled automatically.',
+    definition: 'A range of plausible values for the difference between two population means.',
+    formula: 'CI = (x̄₁ − x̄₂) ± t·√(s₁²/n₁ + s₂²/n₂)',
+    interpretation: ['If the CI excludes 0, the two means differ at the chosen confidence level.'],
+    considerations: ['For paired data, compute differences first then use ci-mean on the differences.']
+  },
+  'ci-diff-prop': {
+    title: 'CI for Difference in Proportions',
+    intro: 'This CI for the Difference in Proportions calculator estimates p₁ − p₂ — e.g., the difference in success rates between two treatments.',
+    definition: 'A range of plausible values for the difference between two population proportions.',
+    formula: '(p̂₁ − p̂₂) ± z·√(p̂₁(1−p̂₁)/n₁ + p̂₂(1−p̂₂)/n₂)',
+    interpretation: ['If the CI excludes 0, the two proportions differ at the chosen confidence level.'],
+    considerations: ['Normal approximation requires moderate sample sizes; for small n use exact methods.']
+  },
+  'ci-moe': {
+    title: 'Margin of Error',
+    intro: 'This Margin of Error calculator reports the current margin and also tells you the sample size needed to achieve a target margin — useful when planning a survey or experiment.',
+    definition: 'The half-width of a confidence interval. Smaller margins mean more precise estimates.',
+    formula: 'Mean: ME = z·σ/√n.  Proportion: ME = z·√(p(1−p)/n).  Solve for n given target ME.',
+    interpretation: ['ME shrinks proportional to 1/√n — halving the margin requires 4× the sample size.'],
+    considerations: ['For proportions, p = 0.5 gives the conservative (worst-case) sample size.']
+  },
+
+  /* ===== PROBABILITY DISTRIBUTIONS ===== */
+  'basic-prob': {
+    title: 'Basic Probability Calculator',
+    intro: 'This Basic Probability calculator takes P(A), P(B), and P(A∩B) and derives the standard combinations — complement, union, conditional probabilities, and tests independence.',
+    definition: 'Applies the fundamental probability rules for combining two events.',
+    formula: 'P(A∪B) = P(A) + P(B) − P(A∩B);  P(A|B) = P(A∩B)/P(B);  Independent iff P(A∩B) = P(A)·P(B)',
+    interpretation: ['Two events are independent when knowing one tells you nothing about the other.'],
+    considerations: ['All probabilities must be in [0, 1]; P(A∩B) cannot exceed min(P(A), P(B)).']
+  },
+  'binomial':       { title: 'Binomial Distribution', intro: 'This Binomial Distribution calculator gives the probability of getting exactly k successes in n independent Bernoulli(p) trials — e.g., 7 heads in 10 coin flips.', definition: 'Counts successes in n independent trials, each with success probability p.', formula: 'P(X=k) = C(n,k) p^k (1−p)^(n−k);  E[X] = np; Var = np(1−p)', interpretation: ['Discrete: k ∈ {0, 1, …, n}.'], considerations: ['Trials must be independent with constant p.'] },
+  'neg-binomial':   { title: 'Negative Binomial', intro: 'This Negative Binomial calculator gives the probability of needing k failures before the r-th success in repeated Bernoulli(p) trials.', definition: 'Distribution of the number of failures before achieving r successes.', formula: 'P(X=k) = C(k+r−1, k) p^r (1−p)^k', interpretation: ['Generalizes the geometric distribution (r=1).'], considerations: ['Different conventions exist (count trials vs. failures); this calculator counts failures.'] },
+  'poisson':        { title: 'Poisson Distribution', intro: 'This Poisson Distribution calculator models counts of rare events in a fixed interval — e.g., calls per hour at a call center.', definition: 'Counts of events occurring at constant rate λ in a fixed interval.', formula: 'P(X=k) = e^(−λ) λ^k / k!;  E[X] = Var = λ', interpretation: ['Used when events are rare, independent, and rate is constant.'], considerations: ['Assumes constant rate; for variable rate use a non-homogeneous Poisson process.'] },
+  'geometric-dist': { title: 'Geometric Distribution', intro: 'This Geometric Distribution calculator gives the probability of needing k failures before the first success (e.g., how many coin flips until the first heads).', definition: 'Number of failures before the first success in Bernoulli(p) trials.', formula: 'P(X=k) = (1−p)^k · p,  k ∈ {0, 1, 2, …}', interpretation: ['Memoryless property: future trials do not depend on past failures.'] },
+  'hypergeometric': { title: 'Hypergeometric Distribution', intro: 'This Hypergeometric Distribution calculator gives the probability of drawing exactly k successes in a sample of size n without replacement from a finite population of N with K successes.', definition: 'Sampling without replacement from a finite population.', formula: 'P(X=k) = C(K,k) C(N−K, n−k) / C(N,n)', interpretation: ['Differs from binomial because draws are not independent.'] },
+  'normal':         { title: 'Normal (Gaussian) Distribution', intro: 'This Normal Distribution calculator computes density, cumulative probability, and quantiles for the most famous bell-shaped distribution — the foundation of much of statistics.', definition: 'Continuous symmetric distribution defined by mean μ and SD σ.', formula: 'f(x) = (1/(σ√(2π))) exp(−½((x−μ)/σ)²)', interpretation: ['~68% within ±1σ, ~95% within ±2σ, ~99.7% within ±3σ.'] },
+  'log-normal':     { title: 'Log-Normal Distribution', intro: 'This Log-Normal Distribution calculator is for variables whose logarithm is normally distributed — common for incomes, asset prices, and biological measurements.', definition: 'X is log-normal iff ln(X) ~ Normal(μ, σ²).', formula: 'PDF involves x in the denominator; CDF uses Φ((ln x − μ)/σ)', interpretation: ['Right-skewed; long upper tail.'] },
+  'logistic-dist':  { title: 'Logistic Distribution', intro: 'This Logistic Distribution calculator is similar to the normal but with heavier tails — used in logistic regression and modeling growth curves.', definition: 'Symmetric distribution with sigmoid CDF.', formula: 'F(x) = 1/(1 + e^(−(x−μ)/s))', interpretation: ['Heavier tails than the normal.'] },
+  'student-t':      { title: "Student's t-Distribution", intro: "This Student's t-Distribution calculator is used when estimating means from small samples with unknown variance. As df grows, it approaches the standard normal.", definition: 'Bell-shaped distribution with heavier tails than normal, parameterized by degrees of freedom.', formula: 'Comes from (Z / √(χ²/df)) where Z ~ N(0,1)', interpretation: ['Used in t-tests and CIs for means.'] },
+  'exponential-dist': { title: 'Exponential Distribution', intro: 'This Exponential Distribution calculator models waiting times between independent events occurring at constant rate λ.', definition: 'Memoryless continuous distribution.', formula: 'f(x) = λ e^(−λx) for x ≥ 0', interpretation: ['Mean = 1/λ; memoryless: P(X > s+t | X > s) = P(X > t).'] },
+  'uniform':        { title: 'Continuous Uniform Distribution', intro: 'This Continuous Uniform Distribution calculator gives equal probability density to all values in [a, b] — the simplest continuous distribution.', definition: 'Constant density between a and b.', formula: 'f(x) = 1/(b − a) for a ≤ x ≤ b', interpretation: ['Mean = (a+b)/2, Variance = (b−a)²/12.'] },
+  'gamma':          { title: 'Gamma Distribution', intro: 'This Gamma Distribution calculator generalizes the exponential — useful for waiting times for multiple events, rainfall, and Bayesian priors.', definition: 'Two-parameter continuous distribution with shape α and scale β.', formula: 'f(x) = x^(α−1) e^(−x/β) / (β^α Γ(α))', interpretation: ['α = 1 gives exponential; α = k/2, β = 2 gives chi-square.'] },
+  'beta-dist':      { title: 'Beta Distribution', intro: 'This Beta Distribution calculator models random variables on [0, 1] — used for proportions, Bayesian priors on probabilities, and order statistics.', definition: 'Continuous distribution on [0, 1] with shape parameters α and β.', formula: 'f(x) ∝ x^(α−1) (1−x)^(β−1)', interpretation: ['α = β = 1 is uniform; α >> β skews right; β >> α skews left.'] },
+  'chi-square-dist':{ title: 'Chi-Square Distribution', intro: 'This Chi-Square Distribution calculator gives probabilities for the sum of df squared standard normals — used in goodness-of-fit, independence, and variance tests.', definition: 'Sum of squared independent standard normals.', formula: 'If Z₁,…,Z_df ~ N(0,1), then ΣZᵢ² ~ χ²(df)', interpretation: ['Mean = df, Variance = 2df.'] },
+  'f-dist':         { title: 'F-Distribution', intro: "This F-Distribution calculator gives probabilities for the ratio of two scaled chi-square variables — used in ANOVA and regression overall-fit tests.", definition: 'Ratio of two independent chi-square variables, each divided by its df.', formula: 'F = (χ²₁/df₁) / (χ²₂/df₂)', interpretation: ['Right-skewed; never negative.'] },
+  'weibull':        { title: 'Weibull Distribution', intro: 'This Weibull Distribution calculator is widely used in survival analysis and reliability engineering for time-to-failure data.', definition: 'Two-parameter continuous distribution with shape k and scale λ.', formula: 'F(x) = 1 − exp(−(x/λ)^k)', interpretation: ['k < 1: decreasing hazard; k = 1: constant (exponential); k > 1: increasing hazard.'] },
+  'inverse-normal': { title: 'Inverse Normal', intro: 'This Inverse Normal calculator solves for x given a target probability — answers questions like "what value of x has 95% of the data below it?"', definition: 'The quantile function (inverse CDF) of the normal distribution.', formula: 'x = μ + σ · Φ⁻¹(q)', interpretation: ['q = 0.5 → median = μ.'] },
+
   /* ===== ANOVA VARIANTS ===== */
   'one-way': {
     title: 'One-way ANOVA',

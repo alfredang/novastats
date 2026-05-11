@@ -50,6 +50,35 @@ window.TestExamples = {
   'outliers':{ dataset: 'exam-scores',    selects: { 'outVar': 0 },                  click: 'outCompute' },
   'fisher':  { inputs: { 'fishA': 10, 'fishB': 2, 'fishC': 3, 'fishD': 15 },         click: 'fishCompute' },
 
+  /* ===== CONFIDENCE INTERVALS ===== */
+  'ci-mean':       { dataset: 'exam-scores',   selects: { 'ciMeanVar': 0 }, click: 'ciMeanCompute' },
+  'ci-proportion': { inputs: { 'ciPropX': 60, 'ciPropN': 100 }, click: 'ciPropCompute' },
+  'ci-sd':         { dataset: 'exam-scores',   selects: { 'ciSdVar': 0 }, click: 'ciSdCompute' },
+  'ci-corr':       { inputs: { 'ciCorrR': 0.7, 'ciCorrN': 30 }, click: 'ciCorrCompute' },
+  'ci-diff-means': { dataset: 'treatment-groups', selects: { 'ciDmVar1': 0, 'ciDmVar2': 1 }, click: 'ciDmCompute' },
+  'ci-diff-prop':  { inputs: { 'ciDpX1': 40, 'ciDpN1': 100, 'ciDpX2': 55, 'ciDpN2': 100 }, click: 'ciDpCompute' },
+  'ci-moe':        { inputs: { 'moeN': 100, 'moeSigma': 10, 'moeTarget': 2 }, click: 'moeCompute' },
+
+  /* ===== PROBABILITY (built-in defaults; just click compute) ===== */
+  'basic-prob':       { click: 'basic-probCompute' },
+  'binomial':         { click: 'binomialCompute' },
+  'neg-binomial':     { click: 'neg-binomialCompute' },
+  'poisson':          { click: 'poissonCompute' },
+  'geometric-dist':   { click: 'geometric-distCompute' },
+  'hypergeometric':   { click: 'hypergeometricCompute' },
+  'normal':           { click: 'normalCompute' },
+  'log-normal':       { click: 'log-normalCompute' },
+  'logistic-dist':    { click: 'logistic-distCompute' },
+  'student-t':        { click: 'student-tCompute' },
+  'exponential-dist': { click: 'exponential-distCompute' },
+  'uniform':          { click: 'uniformCompute' },
+  'gamma':            { click: 'gammaCompute' },
+  'beta-dist':        { click: 'beta-distCompute' },
+  'chi-square-dist':  { click: 'chi-square-distCompute' },
+  'f-dist':           { click: 'f-distCompute' },
+  'weibull':          { click: 'weibullCompute' },
+  'inverse-normal':   { click: 'inverse-normalCompute' },
+
   /* ===== ANOVA VARIANTS ===== */
   'one-way':  { dataset: 'treatment-groups', multiCheck: 'anovaVars',  click: 'anovaCompute' },
   'welch':    { dataset: 'treatment-groups', multiCheck: 'welchVars',  click: 'welchCompute' },

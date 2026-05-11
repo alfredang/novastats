@@ -88,6 +88,14 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
         <span class="nav-label">Chi-Square</span>
       </button>
+      <button class="nav-item" data-module="confidence">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
+        <span class="nav-label">Confidence</span>
+      </button>
+      <button class="nav-item" data-module="probability">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 010 20"/><path d="M12 2a15 15 0 000 20"/></svg>
+        <span class="nav-label">Probability</span>
+      </button>
       <button class="nav-item" data-module="bayesian">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12c-1 0-3-1-3-3s2-3 3-3-3-1-3-3 1-3 3-3"/><path d="M3 12c1 0 3 1 3 3s-2 3-3 3 3 1 3 3-1 3-3 3"/><circle cx="12" cy="12" r="3"/></svg>
         <span class="nav-label">Bayesian</span>
@@ -113,6 +121,8 @@
       <section class="module-panel" id="panel-hypothesis"></section>
       <section class="module-panel" id="panel-chi-square"></section>
       <section class="module-panel" id="panel-anova"></section>
+      <section class="module-panel" id="panel-confidence"></section>
+      <section class="module-panel" id="panel-probability"></section>
       <section class="module-panel" id="panel-bayesian"></section>
       <section class="module-panel" id="panel-ai-insights"></section>
     </main>
@@ -149,6 +159,14 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/></svg>
         ANOVA
       </button>
+      <button class="mobile-tab" data-module="confidence">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
+        CI
+      </button>
+      <button class="mobile-tab" data-module="probability">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/></svg>
+        Prob
+      </button>
       <button class="mobile-tab" data-module="bayesian">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M21 12c-1 0-3-1-3-3s2-3 3-3"/></svg>
         Bayes
@@ -183,6 +201,8 @@
   <script src="js/stats/chi-square.js"></script>
   <script src="js/stats/anova.js"></script>
   <script src="js/stats/bayesian.js"></script>
+  <script src="js/stats/confidence.js"></script>
+  <script src="js/stats/probability.js"></script>
 
   <!-- Data & Visualization -->
   <script src="js/data.js"></script>
@@ -196,6 +216,8 @@
   <script src="js/modules/chi-square.js"></script>
   <script src="js/modules/anova.js"></script>
   <script src="js/modules/bayesian.js"></script>
+  <script src="js/modules/confidence.js"></script>
+  <script src="js/modules/probability.js"></script>
 
   <!-- Explanations & test examples -->
   <script src="js/explanations.js"></script>

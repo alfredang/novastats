@@ -11,6 +11,8 @@ window.UI = {
     'chi-square': { name: 'Chi-Square', icon: 'grid', render: () => ModuleChiSquare.render($('#panel-chi-square')) },
     'anova': { name: 'ANOVA', icon: 'layers', render: () => ModuleAnova.render($('#panel-anova')) },
     'bayesian': { name: 'Bayesian', icon: 'cpu', render: () => ModuleBayesian.render($('#panel-bayesian')) },
+    'confidence': { name: 'Confidence', icon: 'activity', render: () => ModuleConfidence.render($('#panel-confidence')) },
+    'probability': { name: 'Probability', icon: 'globe', render: () => ModuleProbability.render($('#panel-probability')) },
     'ai-insights': { name: 'AI Insights', icon: 'cpu', render: () => AIInsights.render($('#panel-ai-insights')) }
   },
 
