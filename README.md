@@ -34,11 +34,14 @@ NovaStats is a comprehensive statistical analysis web application that runs enti
 | Feature | Description |
 |---------|-------------|
 | **Descriptive Statistics** | Mean, median, mode, variance, standard deviation, quartiles, IQR, and histogram visualization |
+| **Probability** | Basic probability calculator + 17 discrete/continuous distributions (Binomial, Poisson, Normal, Gamma, Beta, Chi-Square, F, Weibull, etc.) with PDF/PMF, CDF, quantiles, mean, and variance |
 | **Correlation Analysis** | Pearson correlation coefficient with scatterplot and significance testing |
 | **Linear Regression** | Regression equation, R², regression line chart, and prediction tool |
-| **Hypothesis Testing** | One/two-sample z-tests, one/two-sample t-tests, paired t-tests with normal curve visualization |
+| **Hypothesis Testing** | Z-tests, t-tests (one/two-sample, paired), non-parametric tests (Mann-Whitney, Wilcoxon, Kruskal-Wallis, Friedman), plus links to ANOVA and Chi-Square families |
+| **Confidence Intervals** | 7 CI tools covering mean (z & t), proportion, difference of means, difference of proportions, variance, and bootstrap |
+| **ANOVA** | One-way, Welch's, and Two-way factorial ANOVA with F-statistic, ANOVA table, effect size (eta-squared), and group comparison charts |
 | **Chi-Square Tests** | Test of independence and goodness-of-fit with observed vs expected comparison charts |
-| **One-Way ANOVA** | F-statistic, ANOVA table, effect size (eta-squared), and group comparison bar chart |
+| **Bayesian / MLE-MAP** | Bayesian inference and Maximum Likelihood / Maximum A Posteriori estimation tools |
 | **AI Insights** | Optional OpenAI/Gemini API integration for AI-powered interpretation of results |
 | **Dark/Light Theme** | Theme toggle with localStorage persistence |
 | **CSV Import/Export** | Paste CSV data or edit an interactive grid; export data and results |
@@ -74,13 +77,15 @@ NovaStats is a comprehensive statistical analysis web application that runs enti
 │  └──────────┘  └──────────┘  └───────────────┘  │
 ├──────────────────────────────────────────────────┤
 │               Module Controllers                  │
-│  Descriptive │ Correlation │ Regression           │
-│  Hypothesis  │ Chi-Square  │ ANOVA                │
+│  Descriptive │ Probability  │ Correlation         │
+│  Regression  │ Hypothesis   │ Confidence Interval │
+│  ANOVA       │ Chi-Square   │ Bayesian            │
 ├──────────────────────────────────────────────────┤
 │               Statistics Engine                   │
-│  descriptive.js │ distributions.js │ correlation  │
-│  regression.js  │ hypothesis.js    │ chi-square   │
-│  anova.js       │                  │              │
+│  descriptive.js │ distributions.js │ probability  │
+│  correlation.js │ regression.js    │ hypothesis   │
+│  confidence.js  │ anova.js         │ chi-square   │
+│  bayesian.js    │                  │              │
 ├──────────────────────────────────────────────────┤
 │  DataManager  │  ChartRenderer  │  AI Insights   │
 │  (CSV parse,  │  (Canvas-based  │  (OpenAI /     │
@@ -110,20 +115,26 @@ novastats/
 │   ├── stats/
 │   │   ├── descriptive.js      # Mean, median, mode, variance, stddev
 │   │   ├── distributions.js    # Normal, t, chi-square, F CDF approximations
+│   │   ├── probability.js      # 17 discrete/continuous distributions
 │   │   ├── correlation.js      # Pearson r, covariance
 │   │   ├── regression.js       # Simple linear regression, prediction
-│   │   ├── hypothesis.js       # Z-tests and t-tests
+│   │   ├── hypothesis.js       # Z-tests, t-tests, non-parametric tests
+│   │   ├── confidence.js       # Confidence interval calculators
 │   │   ├── chi-square.js       # Independence and goodness-of-fit
-│   │   └── anova.js            # One-way ANOVA
+│   │   ├── anova.js            # One-way, Welch's, Two-way ANOVA
+│   │   └── bayesian.js         # Bayesian inference, MLE/MAP estimation
 │   ├── data.js                 # CSV parsing, grid sync, example datasets
 │   ├── charts.js               # Canvas chart renderer
 │   ├── modules/
 │   │   ├── descriptive.js      # Descriptive stats UI controller
+│   │   ├── probability.js      # Probability & distributions UI controller
 │   │   ├── correlation.js      # Correlation UI controller
 │   │   ├── regression.js       # Regression UI controller
 │   │   ├── hypothesis.js       # Hypothesis testing UI controller
+│   │   ├── confidence.js       # Confidence interval UI controller
 │   │   ├── chi-square.js       # Chi-square UI controller
-│   │   └── anova.js            # ANOVA UI controller
+│   │   ├── anova.js            # ANOVA UI controller
+│   │   └── bayesian.js         # Bayesian / MLE-MAP UI controller
 │   ├── ai.js                   # OpenAI / Gemini API integration
 │   ├── export.js               # CSV and results export
 │   ├── ui.js                   # Navigation, theme toggle, data input panel
